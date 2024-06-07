@@ -2,21 +2,24 @@ require 'rails_helper'
 
 RSpec.describe ReviewController, type: :controller do
   before do
-    @admin_user = User.create!(name: 'Admin', password: 'Password123!', email: 'admin@example.com', role: 'admin')
+    @admin_user = User.create!(name: 'Admin', password: 'Password123!', email: 'adminx@example.com', role: 'admin')
     @non_admin_user = User.create!(name: 'User', password: 'Password123!', email: 'user@example.com', role: 'user')
-    @product = Product.create!(nombre: 'Product1', precio: 5000, stock: 5, user_id: @admin_user.id, categories: 'Cancha')
-    @review = Review.create!(tittle: 'Great Product', description: 'Todo bien', calification: 5, product_id: @product.id, user_id: @non_admin_user.id)
+    @product = Product.create!(nombre: 'Product1', precio: 5000, stock: 5, user: @admin_user, categories: 'Cancha')
+
+    @review = Review.create!(tittle: 'Great Product', description: 'Todo bien', calification: 5, product: @product, user: @non_admin_user)
     sign_in @non_admin_user
   end
 
   describe 'POST #insertar' do
-    let(:valid_params) { { review: { tittle: 'Awesome', description: 'Me encanta el producto', calification: '5' }, product_id: @product.id } }
-    let(:invalid_params) { { review: { tittle: '', description: '', calification: 5 }, product_id: @product.id } }
+    let(:valid_params) { { review: { tittle: 'Awesome', description: 'Me encanta el producto', calification: 5, product_id: @product.id, user_id: @non_admin_user.id}, product_id: @product.id } }
+    let(:invalid_params) { { review: { tittle: '', description: '', calification: 5 }, product_id: @product.id, user: @non_admin_user} }
 
     it 'creates a new review with valid parameters' do
       post :insertar, params: valid_params
+      puts flash[:error]
+
       expect(response).to redirect_to("/products/leer/#{@product.id}")
-      # expect(flash[:notice]).to eq('Review creado Correctamente! ')
+      expect(flash[:notice]).to eq('Review creado Correctamente! ')
 
       # new_review = Review.order(created_at: :desc).first
       # expect(new_review.tittle).to eq('Awesome')

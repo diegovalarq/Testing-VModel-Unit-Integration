@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe MessageController, type: :controller do
   before do
-    @admin_user = User.create!(name: 'Admin', password: 'Password123!', email: 'admin@example.com', role: 'admin')
+    @admin_user = User.create!(name: 'Admin', password: 'Password123!', email: 'admins@example.com', role: 'admin')
     @non_admin_user = User.create!(name: 'User', password: 'Password123!', email: 'user@example.com', role: 'user')
     @product = Product.create!(nombre: 'Product1', precio: 5000, stock: 5, user_id: @admin_user.id, categories: 'Cancha')
     @message = Message.create!(body: 'This is a message', product_id: @product.id, user_id: @non_admin_user.id)

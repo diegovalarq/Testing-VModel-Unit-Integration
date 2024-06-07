@@ -7,6 +7,12 @@ RSpec.describe ProductsController, type: :controller do
     sign_in @admin_user
     @product1 = Product.create!(nombre: 'John1', precio: 4000, stock: 1, user_id: @admin_user.id, categories: 'Cancha')
     @product2 = Product.create!(nombre: 'Steve1', precio: 500, stock: 3, user_id: @non_admin_user.id, categories: 'Suplementos')
+
+    
+    @review1 = Review.create!(tittle: 'Great Product', description: 'Todo bien', calification: 5, product: @product1, user: @non_admin_user)
+
+    @review2 = Review.create!(tittle: 'Great Product', description: 'Todo bien', calification: 4, product: @product1, user: @non_admin_user)
+
   end
 
   describe 'GET #index' do
@@ -41,6 +47,19 @@ RSpec.describe ProductsController, type: :controller do
       get :leer, params: { id: @product2.id }
       expect(assigns(:product)).to eq(@product2)
     end
+
+    it 'calculates total_califications correctly' do
+      @product4 = Product.create!(nombre: 'Steve1', precio: 500, stock: 3, user_id: @non_admin_user.id, categories: 'Suplementos', reviews: [@review1, @review2])
+      get :leer, params: { id: @product1.id }
+      expect(assigns(:total_califications)).to be_falsey
+    end
+
+    it 'parses horarios correctly' do
+      @product3 = Product.create!(nombre: 'Steve1', precio: 500, stock: 3, user_id: @non_admin_user.id, categories: 'Suplementos', horarios: 'Monday,9:00 AM;Tuesday,10:00 AM')
+      get :leer, params: { id: @product3.id }
+      expect(assigns(:horarios)).to eq([['Monday', '9:00 AM'], ['Tuesday', '10:00 AM']])
+    end
+
   end
 
   describe 'GET #crear' do
@@ -134,6 +153,20 @@ RSpec.describe ProductsController, type: :controller do
       @non_admin_user.reload
       expect(@non_admin_user.deseados).to include(@product2.id.to_s)
       expect(response).to redirect_to("/products/leer/#{@product2.id}")
+    end
+
+    it 'does not add product to the wishlist' do
+      sign_in @non_admin_user
+      post :insert_deseado, params: { product_id: ''}
+      expected_error_message = "Hubo un error al guardar los cambios: #{assigns(:current_user).errors.full_messages.join(', ')}"
+      expect(flash[:error]).to eq(expected_error_message)
+    end
+
+    it 'adds product to the wishlist if nil' do
+      @product5 = Product.create!(nombre: 'Steve1', precio: 500, stock: 3, user_id: @non_admin_user.id, categories: 'Suplementos')
+      sign_in @non_admin_user
+      post :insert_deseado, params: { product_id: @product5.id }
+      expect(@non_admin_user.reload.deseados).to eq([@product5.id.to_s])
     end
   end
 end
