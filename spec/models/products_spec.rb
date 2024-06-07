@@ -66,8 +66,4 @@ RSpec.describe Product, type: :model do
     @product.precio = -1
     expect(@product).to_not be_valid
   end
-
-
-
-
 end
