@@ -17,13 +17,15 @@ RSpec.describe SolicitudController, type: :controller do
   describe 'POST #insertar' do
     context 'with valid parameters' do
       it 'creates a new solicitud' do
-        solicitud_params = { solicitud: { stock: 5 }, product_id: 
-        @product.id }
+        solicitud_params = { solicitud: { stock: 5,  reservation_datetime: '2024-06-07T12:00:00' }, product_id: 
+        @product.id}
         expect {
           post :insertar, params: solicitud_params
         }.to change(Solicitud, :count).by(1)
         expect(response).to redirect_to("/products/leer/#{@product.id}")
         expect(flash[:notice]).to eq('Solicitud de compra creada correctamente!')
+        @solicitud = Solicitud.last
+        expect(@solicitud.reservation_info).to eq('Solicitud de reserva para el día 07/06/2024, a las 12:00 hrs')
       end
     end
 
@@ -46,6 +48,28 @@ RSpec.describe SolicitudController, type: :controller do
       expect(response).to redirect_to('/solicitud/index')
       expect(flash[:notice]).to eq('Solicitud eliminada correctamente!')
     end
+
+    it 'does not deletes an existing solicitud' do
+      solicitud = Solicitud.create!(status: 'Pendiente', stock: '1', product: @product, user: @admin_user)
+
+      allow_any_instance_of(Solicitud).to receive(:destroy).and_return(false)
+      expect {
+        delete :eliminar, params: { id: solicitud.id }
+      }.not_to change(Solicitud, :count)
+      expect(response).to redirect_to('/solicitud/index')
+      expect(flash[:error]).to eq('Hubo un error al eliminar la solicitud!')
+    end
+
+    it 'does not create a new solicitud' do
+      solicitud_params = { solicitud: { stock: '' }, product_id: @product.id }
+
+      expect {
+        post :insertar, params: solicitud_params
+      }.not_to change(Solicitud, :count)
+
+      expect(response).to redirect_to("/products/leer/#{@product.id}")
+      expect(flash[:error]).to eq('Hubo un error al guardar la solicitud!')
+    end
   end
 
   describe 'PATCH #actualizar' do
@@ -55,6 +79,14 @@ RSpec.describe SolicitudController, type: :controller do
       expect(response).to redirect_to('/solicitud/index')
       expect(flash[:notice]).to eq('Solicitud aprobada correctamente!')
       expect(solicitud.reload.status).to eq('Aprobada')
+    end
+
+    it 'handles errors when updating the status of a solicitud' do
+      solicitud = Solicitud.create!(status: 'Pendiente', stock: 5, product: @product, user: @admin_user)
+      allow_any_instance_of(Solicitud).to receive(:update).and_return(false)
+      patch :actualizar, params: { id: solicitud.id }
+      expect(response).to redirect_to('/solicitud/index')
+      expect(flash[:error]).to eq('Hubo un error al aprobar la solicitud!')
     end
   end
 end
