@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe 'ShoppingCart', type: :controller do
+RSpec.describe ShoppingCartController, type: :controller do
   let(:user) { create(:user) }
   let(:product) { create(:product, stock: 10) }
   let(:shopping_cart) { create(:shopping_cart, user: user, products: {}) }
