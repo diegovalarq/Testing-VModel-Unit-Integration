@@ -18,7 +18,7 @@ RSpec.describe Product, type: :model do
   end
 
   it 'is invalid with multiple categories' do
-    @product.categories = 'Cancha, Accesorio tecnologico'
+    @product.categories = 'Cancha, Accesorio tecnologico a'
     expect(@product).to_not be_valid
   end
 
