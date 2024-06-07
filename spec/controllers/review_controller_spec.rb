@@ -4,14 +4,14 @@ RSpec.describe ReviewController, type: :controller do
   before do
     @admin_user = User.create!(name: 'Admin', password: 'Password123!', email: 'adminx@example.com', role: 'admin')
     @non_admin_user = User.create!(name: 'User', password: 'Password123!', email: 'user@example.com', role: 'user')
-    @product = Product.create!(nombre: 'Product1', precio: 5000, stock: 5, user: @admin_user, categories: 'Cancha')
+    @product = Product.create!(nombre: 'Product1', precio: 5000, stock: 5, user: @non_admin_user, categories: 'Cancha')
 
-    @review = Review.create!(tittle: 'Great Product', description: 'Todo bien', calification: 5, product: @product, user: @non_admin_user)
+    @review = Review.create!(tittle: 'Great Product', description: 'Todo bien', calification: 5, product_id: @product.id, user_id: @non_admin_user.id)
     sign_in @non_admin_user
   end
 
   describe 'POST #insertar' do
-    let(:valid_params) { { review: { tittle: 'Awesome', description: 'Me encanta el producto', calification: 5, product_id: @product.id, user_id: @non_admin_user.id}, product_id: @product.id } }
+    let(:valid_params) { { review: { tittle: 'Awesome', description: 'Me encanta el producto', calification: 5, product_id: @product, user_id: @non_admin_user.id} } }
     let(:invalid_params) { { review: { tittle: '', description: '', calification: 5 }, product_id: @product.id, user: @non_admin_user} }
 
     it 'creates a new review with valid parameters' do
@@ -19,7 +19,7 @@ RSpec.describe ReviewController, type: :controller do
       puts flash[:error]
 
       expect(response).to redirect_to("/products/leer/#{@product.id}")
-      expect(flash[:notice]).to eq('Review creado Correctamente! ')
+      expect(flash[:notice]).to eq('Review creado Correctamente!')
 
       # new_review = Review.order(created_at: :desc).first
       # expect(new_review.tittle).to eq('Awesome')
@@ -42,8 +42,9 @@ RSpec.describe ReviewController, type: :controller do
     end
 
     it 'does not update a review with invalid parameters' do
-      patch :actualizar_review, params: { id: @review.id, review: { tittle: '', description: '', calification: 4 } }
-      # expect(flash[:error]).to eq('Hubo un error al editar la reseña. Complete todos los campos solicitados!')
+      patch :actualizar_review, params: { id: @review.id, review: { tittle: '', description: 'Bueno', calification: 4 } }
+      puts flash[:error]
+      expect(flash[:error]).to eq('Hubo un error al editar la reseña. Complete todos los campos solicitados!')
       expect(response).to redirect_to("/products/leer/#{@product.id}")
     end
   end
