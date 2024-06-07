@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe ContactMessageController, type: :controller do
   before do
-    @admin_user = User.create!(name: 'Admin', password: 'Password123!', email: 'admin@example.com', role: 'admin')
+    @admin_user = User.create!(name: 'Admin', password: 'Password123!', email: 'adminz@example.com', role: 'admin')
     @non_admin_user = User.create!(name: 'User', password: 'Password123!', email: 'user@example.com', role: 'user')
     @contact_message = ContactMessage.create!(name: 'John Doe', mail: 'john@example.com', phone: '+56912345678', title: 'Help', body: 'I need help.')
   end
