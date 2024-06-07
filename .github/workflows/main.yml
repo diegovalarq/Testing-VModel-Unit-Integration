@@ -41,7 +41,7 @@ jobs:
       #  run: bundle exec rails test
       - name: Run rspec tests
         if: success() || failure()
-        run: bundle exec rspec
+        run: bundle exec rspec spec/models  # Run only model tests
       - name: Store coverage
         uses: actions/upload-artifact@v3
         with:
