@@ -4,12 +4,19 @@ RSpec.describe ContactMessageController, type: :controller do
   before do
     @admin_user = User.create!(name: 'Admin', password: 'Password123!', email: 'adminz@example.com', role: 'admin')
     @non_admin_user = User.create!(name: 'User', password: 'Password123!', email: 'user@example.com', role: 'user')
-    @contact_message = ContactMessage.create!(name: 'John Doe', mail: 'john@example.com', phone: '+56912345678', title: 'Help', body: 'I need help.')
+    @contact_message = ContactMessage.create!(name: 'John Doe', mail: 'john@example.com', phone: '+56912345678',
+                                              title: 'Help', body: 'I need help.')
   end
 
   describe 'POST #crear' do
-    let(:valid_params) { { contact: { name: 'Jane Doe', mail: 'jane@example.com', phone: '+56987654321', title: 'Support', body: 'I need support.' } } }
-    let(:invalid_params) { { contact: { name: '', mail: 'jane@example.com', phone: '0987654321', title: 'Support', body: 'I need support.' } } }
+    let(:valid_params) do
+      { contact: { name: 'Jane Doe', mail: 'jane@example.com', phone: '+56987654321', title: 'Support',
+                   body: 'I need support.' } }
+    end
+    let(:invalid_params) do
+      { contact: { name: '', mail: 'jane@example.com', phone: '0987654321', title: 'Support',
+                   body: 'I need support.' } }
+    end
 
     it 'creates a new contact message with valid parameters' do
       post :crear, params: valid_params
@@ -18,9 +25,9 @@ RSpec.describe ContactMessageController, type: :controller do
     end
 
     it 'does not create a new contact message with invalid parameters' do
-      expect {
+      expect do
         post :crear, params: invalid_params
-      }.not_to change(ContactMessage, :count)
+      end.not_to change(ContactMessage, :count)
       expect(response).to redirect_to('/contacto')
       expect(flash[:alert]).to include('Error al enviar el mensaje de contacto')
     end
@@ -39,17 +46,17 @@ RSpec.describe ContactMessageController, type: :controller do
       before { sign_in @admin_user }
 
       it 'deletes the contact message' do
-        expect {
+        expect do
           delete :eliminar, params: { id: @contact_message.id }
-        }.to change(ContactMessage, :count).by(-1)
+        end.to change(ContactMessage, :count).by(-1)
         expect(response).to redirect_to('/contacto')
         expect(flash[:notice]).to eq('Mensaje de contacto eliminado correctamente')
       end
 
       it 'shows an error message if the contact message does not exist' do
-        expect {
-          delete :eliminar, params: { id: 999999 }
-        }.not_to change(ContactMessage, :count)
+        expect do
+          delete :eliminar, params: { id: 999_999 }
+        end.not_to change(ContactMessage, :count)
         expect(response).to redirect_to('/contacto')
         expect(flash[:alert]).to eq('Error al eliminar el mensaje de contacto')
       end
@@ -59,9 +66,9 @@ RSpec.describe ContactMessageController, type: :controller do
       before { sign_in @non_admin_user }
 
       it 'does not delete the contact message' do
-        expect {
+        expect do
           delete :eliminar, params: { id: @contact_message.id }
-        }.not_to change(ContactMessage, :count)
+        end.not_to change(ContactMessage, :count)
         expect(response).to redirect_to('/contacto')
         expect(flash[:alert]).to eq('Debes ser un administrador para eliminar un mensaje de contacto.')
       end
@@ -73,18 +80,18 @@ RSpec.describe ContactMessageController, type: :controller do
       before { sign_in @admin_user }
 
       it 'deletes all contact messages' do
-        expect {
+        expect do
           delete :limpiar
-        }.to change(ContactMessage, :count).by(-1)
+        end.to change(ContactMessage, :count).by(-1)
         expect(response).to redirect_to('/contacto')
         expect(flash[:notice]).to eq('Mensajes de contacto eliminados correctamente')
       end
 
       it 'shows an error message if there are no contact messages to delete' do
         ContactMessage.delete_all
-        expect {
+        expect do
           delete :limpiar
-        }.not_to change(ContactMessage, :count)
+        end.not_to change(ContactMessage, :count)
         expect(response).to redirect_to('/contacto')
         expect(flash[:alert]).to eq('Error al eliminar los mensajes de contacto')
       end
@@ -94,9 +101,9 @@ RSpec.describe ContactMessageController, type: :controller do
       before { sign_in @non_admin_user }
 
       it 'does not delete any contact messages' do
-        expect {
+        expect do
           delete :limpiar
-        }.not_to change(ContactMessage, :count)
+        end.not_to change(ContactMessage, :count)
         expect(response).to redirect_to('/contacto')
         expect(flash[:alert]).to eq('Debes ser un administrador para eliminar los mensajes de contacto.')
       end

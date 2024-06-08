@@ -32,7 +32,7 @@ RSpec.describe UsersController, type: :controller do
   describe 'PATCH #actualizar_imagen' do
     context 'with valid image' do
       it 'updates the user image' do
-        mock_image = fixture_file_upload('files/test_image.jpg', 'image/jpeg')
+        mock_image = fixture_file_upload('mock_image.jpg', 'image/jpeg')
         patch :actualizar_imagen, params: { image: mock_image }
         expect(response).to redirect_to('/users/show')
         expect(flash[:notice]).to eq('Imagen actualizada correctamente')
@@ -42,7 +42,7 @@ RSpec.describe UsersController, type: :controller do
 
     context 'with invalid image' do
       it 'does not update the user image' do
-        mock_invalid_image = fixture_file_upload('files/test_file.txt', 'text/plain')
+        mock_invalid_image = fixture_file_upload('mock_image.txt', 'text/plain')
         patch :actualizar_imagen, params: { image: mock_invalid_image }
         expect(response).to redirect_to('/users/show')
         expect(flash[:error]).to eq('Hubo un error al actualizar la imagen. Verifique que la imagen es de formato jpg, jpeg, png, gif o webp')
@@ -58,6 +58,23 @@ RSpec.describe UsersController, type: :controller do
       expect(response).to redirect_to('/users/deseados')
       expect(flash[:notice]).to eq('Producto quitado de la lista de deseados')
       expect(@user.reload.deseados).to be_empty
+    end
+
+    it 'sets flash[:error] when there is an error removing a product from the wishlist' do
+      # Add the product to the user's wishlist
+      @user.update(deseados: [@product1.id])
+
+      # Stub the save method to return false
+      allow_any_instance_of(User).to receive(:save).and_return(false)
+
+      # Perform the delete action
+      delete :eliminar_deseado, params: { deseado_id: @product1.id }
+
+      # Check the response
+      expect(response).to redirect_to('/users/deseados')
+
+      # Check the flash message
+      expect(flash[:error]).to eq('Hubo un error al quitar el producto de la lista de deseados')
     end
   end
 end

@@ -6,13 +6,14 @@ RSpec.describe ProductsController, type: :controller do
     @non_admin_user = User.create!(name: 'Steve', password: 'Yesyes321!', email: 'hjkl@gmail.com', role: 'user')
     sign_in @admin_user
     @product1 = Product.create!(nombre: 'John1', precio: 4000, stock: 1, user_id: @admin_user.id, categories: 'Cancha')
-    @product2 = Product.create!(nombre: 'Steve1', precio: 500, stock: 3, user_id: @non_admin_user.id, categories: 'Suplementos')
+    @product2 = Product.create!(nombre: 'Steve1', precio: 500, stock: 3, user_id: @non_admin_user.id,
+                                categories: 'Suplementos')
 
-    
-    @review1 = Review.create!(tittle: 'Great Product', description: 'Todo bien', calification: 5, product: @product1, user: @non_admin_user)
+    @review1 = Review.create!(tittle: 'Great Product', description: 'Todo bien', calification: 5, product: @product1,
+                              user: @non_admin_user)
 
-    @review2 = Review.create!(tittle: 'Great Product', description: 'Todo bien', calification: 4, product: @product1, user: @non_admin_user)
-
+    @review2 = Review.create!(tittle: 'Great Product', description: 'Todo bien', calification: 4, product: @product1,
+                              user: @non_admin_user)
   end
 
   describe 'GET #index' do
@@ -49,17 +50,18 @@ RSpec.describe ProductsController, type: :controller do
     end
 
     it 'calculates total_califications correctly' do
-      @product4 = Product.create!(nombre: 'Steve1', precio: 500, stock: 3, user_id: @non_admin_user.id, categories: 'Suplementos', reviews: [@review1, @review2])
+      @product4 = Product.create!(nombre: 'Steve1', precio: 500, stock: 3, user_id: @non_admin_user.id,
+                                  categories: 'Suplementos', reviews: [@review1, @review2])
       get :leer, params: { id: @product1.id }
       expect(assigns(:total_califications)).to be_falsey
     end
 
     it 'parses horarios correctly' do
-      @product3 = Product.create!(nombre: 'Steve1', precio: 500, stock: 3, user_id: @non_admin_user.id, categories: 'Suplementos', horarios: 'Monday,9:00 AM;Tuesday,10:00 AM')
+      @product3 = Product.create!(nombre: 'Steve1', precio: 500, stock: 3, user_id: @non_admin_user.id,
+                                  categories: 'Suplementos', horarios: 'Monday,9:00 AM;Tuesday,10:00 AM')
       get :leer, params: { id: @product3.id }
       expect(assigns(:horarios)).to eq([['Monday', '9:00 AM'], ['Tuesday', '10:00 AM']])
     end
-
   end
 
   describe 'GET #crear' do
@@ -73,9 +75,9 @@ RSpec.describe ProductsController, type: :controller do
     let(:new_product_params) { { nombre: 'ProductoCreado', precio: 450, stock: 9, categories: 'Equipamiento' } }
 
     it 'creates a new product with valid parameters for admin' do
-      expect {
+      expect do
         post :insertar, params: { product: new_product_params }
-      }.to change(Product, :count).by(1)
+      end.to change(Product, :count).by(1)
       expect(response).to redirect_to('/products/index')
     end
 
@@ -101,15 +103,17 @@ RSpec.describe ProductsController, type: :controller do
   end
 
   describe 'PATCH #actualizar_producto' do
-    let(:updated_params) { { nombre: 'UpdatedProduct', precio: 900, stock: 13, categories: 'Accesorio de entrenamiento' } }
+    let(:updated_params) do
+      { nombre: 'UpdatedProduct', precio: 900, stock: 13, categories: 'Accesorio de entrenamiento' }
+    end
 
     it 'updates product with valid parameters for admin' do
       patch :actualizar_producto, params: { id: @product1.id, product: updated_params }
       expect(response).to redirect_to('/products/index')
       @product1.reload
       expect(@product1.nombre).to eq('UpdatedProduct')
-      expect(@product1.precio).to eq("900")
-      expect(@product1.stock).to eq("13")
+      expect(@product1.precio).to eq('900')
+      expect(@product1.stock).to eq('13')
       expect(@product1.categories).to eq('Accesorio de entrenamiento')
     end
 
@@ -129,18 +133,18 @@ RSpec.describe ProductsController, type: :controller do
 
   describe 'DELETE #eliminar' do
     it 'deletes the product for admin user' do
-      expect {
+      expect do
         delete :eliminar, params: { id: @product1.id }
-      }.to change(Product, :count).by(-1)
+      end.to change(Product, :count).by(-1)
       expect(response).to redirect_to('/products/index')
     end
 
     it 'does not delete the product for non-admin user' do
       sign_out @admin_user
       sign_in @non_admin_user
-      expect {
+      expect do
         delete :eliminar, params: { id: @product2.id }
-      }.not_to change(Product, :count)
+      end.not_to change(Product, :count)
       expect(response).to redirect_to('/products/index')
     end
   end
@@ -157,13 +161,15 @@ RSpec.describe ProductsController, type: :controller do
 
     it 'does not add product to the wishlist' do
       sign_in @non_admin_user
-      post :insert_deseado, params: { product_id: ''}
+      post :insert_deseado, params: { product_id: '' }
       expected_error_message = "Hubo un error al guardar los cambios: #{assigns(:current_user).errors.full_messages.join(', ')}"
       expect(flash[:error]).to eq(expected_error_message)
     end
 
     it 'adds product to the wishlist if nil' do
-      @product5 = Product.create!(nombre: 'Steve1', precio: 500, stock: 3, user_id: @non_admin_user.id, categories: 'Suplementos')
+      @non_admin_user.update(deseados: [])
+      @product5 = Product.create!(nombre: 'Steve1', precio: 500, stock: 3, user_id: @non_admin_user.id,
+                                  categories: 'Suplementos')
       sign_in @non_admin_user
       post :insert_deseado, params: { product_id: @product5.id }
       expect(@non_admin_user.reload.deseados).to eq([@product5.id.to_s])

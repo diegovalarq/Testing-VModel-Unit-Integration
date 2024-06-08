@@ -1,5 +1,4 @@
 class ContactMessageController < ApplicationController
- 
   def crear
     @contact_message = ContactMessage.new(contact_message_params)
     if @contact_message.save
@@ -11,7 +10,6 @@ class ContactMessageController < ApplicationController
     redirect_to '/contacto'
   end
 
- 
   def mostrar
     @contact_messages = ContactMessage.all.order(created_at: :desc)
     render 'contacto'
@@ -47,7 +45,6 @@ class ContactMessageController < ApplicationController
 
   private
 
- 
   def contact_message_params
     params.require(:contact).permit(:name, :mail, :phone, :title, :body)
   end

@@ -155,9 +155,9 @@ class ShoppingCartController < ApplicationController
     params.require(:add).permit(:amount)
   end
 
-  def address_params
-    params.require(:address).permit(:nombre, :direccion, :comuna, :region)
-  end
+  # def address_params
+  #   params.require(:address).permit(:nombre, :direccion, :comuna, :region)
+  # end
 
   def crear_carro
     shopping_cart = ShoppingCart.new

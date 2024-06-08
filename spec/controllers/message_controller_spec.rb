@@ -4,7 +4,8 @@ RSpec.describe MessageController, type: :controller do
   before do
     @admin_user = User.create!(name: 'Admin', password: 'Password123!', email: 'admins@example.com', role: 'admin')
     @non_admin_user = User.create!(name: 'User', password: 'Password123!', email: 'user@example.com', role: 'user')
-    @product = Product.create!(nombre: 'Product1', precio: 5000, stock: 5, user_id: @admin_user.id, categories: 'Cancha')
+    @product = Product.create!(nombre: 'Product1', precio: 5000, stock: 5, user_id: @admin_user.id,
+                               categories: 'Cancha')
     @message = Message.create!(body: 'This is a message', product_id: @product.id, user_id: @non_admin_user.id)
     sign_in @non_admin_user
   end
@@ -28,7 +29,8 @@ RSpec.describe MessageController, type: :controller do
 
     it 'creates a new message with ancestry' do
       parent_message = Message.create!(body: 'Parent message', product_id: @product.id, user_id: @non_admin_user.id)
-      post :insertar, params: valid_params.merge(message: { body: 'This is a child message', ancestry: parent_message.id.to_s })
+      post :insertar,
+           params: valid_params.merge(message: { body: 'This is a child message', ancestry: parent_message.id.to_s })
       expect(flash[:notice]).to eq('Pregunta creada correctamente!')
       expect(response).to redirect_to("/products/leer/#{@product.id}")
       expect(Message.last.body).to eq('This is a child message')
