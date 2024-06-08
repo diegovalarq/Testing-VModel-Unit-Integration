@@ -10,10 +10,11 @@ class ReviewController < ApplicationController
     @review.user_id = current_user.id
 
     if @review.save
-      flash[:notice] = 'Review creado Correctamente !'
+      # flash[:notice] = 'Review creado Correctamente !'
     else
       flash[:error] =
         'Hubo un error al guardar la reseña; debe completar todos los campos solicitados.'
+      Rails.logger.debug @review.errors.full_messages.inspect
     end
     redirect_to "/products/leer/#{params[:product_id]}"
   end
@@ -23,7 +24,8 @@ class ReviewController < ApplicationController
     @reviews = Review.find(params[:id])
 
     unless @reviews.update(parametros)
-      flash[:error] = 'Hubo un error al editar la reseña. Complete todos los campos solicitados!'
+      # flash[:error] = 'Hubo un error al editar la reseña. Complete todos los campos solicitados!'
+
     end
     redirect_to "/products/leer/#{@reviews.product.id}"
   end
