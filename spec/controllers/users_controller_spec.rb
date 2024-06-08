@@ -45,7 +45,11 @@ RSpec.describe UsersController, type: :controller do
         mock_invalid_image = fixture_file_upload('mock_image.txt', 'text/plain')
         patch :actualizar_imagen, params: { image: mock_invalid_image }
         expect(response).to redirect_to('/users/show')
+        # rubocop:disable Layout/LineLength
+
         expect(flash[:error]).to eq('Hubo un error al actualizar la imagen. Verifique que la imagen es de formato jpg, jpeg, png, gif o webp')
+        # rubocop:enable Layout/LineLength
+
         expect(@user.reload.image.attached?).to be_falsey
       end
     end

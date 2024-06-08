@@ -162,7 +162,9 @@ RSpec.describe ProductsController, type: :controller do
     it 'does not add product to the wishlist' do
       sign_in @non_admin_user
       post :insert_deseado, params: { product_id: '' }
+      # rubocop:disable Layout/LineLength
       expected_error_message = "Hubo un error al guardar los cambios: #{assigns(:current_user).errors.full_messages.join(', ')}"
+      # rubocop:enable Layout/LineLength
       expect(flash[:error]).to eq(expected_error_message)
     end
 

@@ -19,6 +19,9 @@ Layout/LineLength:
 Metrics/BlockLength:
   Max: 90
 
+Metrics/BlockLength:
+  AllowedMethods: ['describe', 'context']
+
 # Offense count: 5
 # Configuration parameters: EnforcedStyle, CheckMethodNames, CheckSymbols, AllowedIdentifiers, AllowedPatterns.
 # SupportedStyles: snake_case, normalcase, non_integer

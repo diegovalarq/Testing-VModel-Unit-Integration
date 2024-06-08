@@ -96,8 +96,11 @@ RSpec.describe ShoppingCartController, type: :controller do
             post :insertar_producto, params: { product_id:, add: { amount: 1 } }
           end
         end
+        # rubocop:disable Layout/LineLength
 
         expect(flash[:alert]).to eq('Has alcanzado el máximo de productos en el carro de compras (8). Elimina productos para agregar más o realiza el pago de los productos actuales.')
+        # rubocop:enable Layout/LineLength
+
         expect(response).to redirect_to(root_path)
       end
     end
@@ -109,7 +112,11 @@ RSpec.describe ShoppingCartController, type: :controller do
           post :insertar_producto, params: valid_params
         end.not_to(change { @shopping_cart.reload.products })
         expect(response).to redirect_to(root_path)
+        # rubocop:disable Layout/LineLength
+
         expected_error_message = "El producto '#{@product.nombre}' no tiene suficiente stock para agregarlo al carro de compras."
+        # rubocop:enable Layout/LineLength
+
         expect(flash[:alert]).to eq(expected_error_message)
       end
     end
@@ -289,7 +296,11 @@ RSpec.describe ShoppingCartController, type: :controller do
       @product1.update(stock: 0)
 
       post :realizar_compra
+      # rubocop:disable Layout/LineLength
+
       expected_message = "Compra cancelada: El producto '#{@product.nombre}' no tiene suficiente stock para realizar la compra. Por favor, elimina el producto del carro de compras o reduce la cantidad."
+      # rubocop:enable Layout/LineLength
+
       expect(flash[:alert]).to eq(expected_message)
     end
   end
