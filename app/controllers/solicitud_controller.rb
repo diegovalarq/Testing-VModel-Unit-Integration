@@ -24,11 +24,40 @@ class SolicitudController < ApplicationController
       producto.stock = producto.stock.to_i - @solicitud.stock.to_i
     end
 
-    if params[:solicitud][:reservation_datetime].present?
-      fecha = params[:solicitud][:reservation_datetime].to_datetime
-      dia = fecha.strftime('%d/%m/%Y')
-      hora = fecha.strftime('%H:%M')
-      @solicitud.reservation_info = "Solicitud de reserva para el día #{dia}, a las #{hora} hrs"
+    if producto.horarios.present?
+      if params[:solicitud][:reservation_datetime].blank?
+        flash[:error] = 'Debe seleccionar una fecha y hora para la reserva!'
+        redirect_to "/products/leer/#{params[:product_id]}"
+        return
+      end
+      dias = producto.horarios.split(';')
+      horarios = []
+      dias.each do |dia|
+        horarios << dia.split(',')
+      end
+      start_day = producto.day_to_number(horarios[0][0])
+      start_hour = horarios[0][1]
+      end_day = producto.day_to_number(horarios[1][0])
+      end_hour = horarios[1][1]
+      date_reserva = params[:solicitud][:reservation_datetime].to_datetime
+
+      if producto.date_on_range(start_day, end_day, start_hour, end_hour, date_reserva)
+        fecha = date_reserva
+        dia = fecha.strftime('%d/%m/%Y')
+        hora = fecha.strftime('%H:%M')
+        @solicitud.reservation_info = "Solicitud de reserva para el día #{dia}, a las #{hora} hrs"
+      else
+        flash[:error] = 'Fecha de reserva fuera del rango disponible para reservar!'
+        redirect_to "/products/leer/#{params[:product_id]}"
+        return
+      end
+    else
+      if params[:solicitud][:reservation_datetime].present?
+        fecha = params[:solicitud][:reservation_datetime].to_datetime
+        dia = fecha.strftime('%d/%m/%Y')
+        hora = fecha.strftime('%H:%M')
+        @solicitud.reservation_info = "Solicitud de reserva para el día #{dia}, a las #{hora} hrs"
+      end
     end
 
     if @solicitud.save && producto.update(stock: producto.stock)
