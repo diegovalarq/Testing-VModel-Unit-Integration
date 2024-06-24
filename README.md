@@ -10,7 +10,7 @@ Incluir aqui cualquier detalle que pueda ser importante al momento de corregir.
 
 * Respecto a las reservas, se verifica que la fecha de reserva corresponda a los horarios del producto. Para ello contemplamos los siguientes supuestos:
 1. Los días se ingresan en inglés, de la siguiente forma: Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday.
-2. 
+* se añadió la validación de la fecha y hora de una reserva en el solicitud_controller.
 
 
 Nos hemos apoyado en GPT para generar los tests, en especial de shoppingcart, pues eran muchos casos y muy confusos

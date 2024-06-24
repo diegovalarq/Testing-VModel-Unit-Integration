@@ -41,7 +41,7 @@ RSpec.describe SolicitudController, type: :controller do
 
     context 'with product with horario' do
       it 'creates a new solicitud with valid reservation' do
-        @product.update(horarios: 'Wednesday,08:00;Friday,20:00')
+        @product.update(horarios: 'Wednesday,08:00,18:00;Friday,10:00,22:00')
         solicitud_params = { solicitud: { stock: 1, reservation_datetime: '2024-06-07T12:00:00' }, product_id:
         @product.id }
         expect do
@@ -54,18 +54,18 @@ RSpec.describe SolicitudController, type: :controller do
       end
 
       it 'does not create a new solicitud with invalid day' do
-        @product.update(horarios: 'Wednesday,08:00;Friday,20:00')
+        @product.update(horarios: 'Wednesday,08:00,18:00;Friday,20:00,22:00')
         solicitud_params = { solicitud: { stock: 1, reservation_datetime: '2024-06-08T12:00:00' }, product_id:
         @product.id }
         expect do
           post :insertar, params: solicitud_params
         end.to change(Solicitud, :count).by(0)
         expect(response).to redirect_to("/products/leer/#{@product.id}")
-        expect(flash[:error]).to eq('Fecha de reserva fuera del rango disponible para reservar!')
+        expect(flash[:error]).to eq('No hay reservas disponibles en el día y hora seleccionada!')
       end
 
       it 'does not create a new solicitud with empty reservation date' do
-        @product.update(horarios: 'Wednesday,08:00;Friday,20:00')
+        @product.update(horarios: 'Wednesday,08:00,18:00;Friday,20:00,22:00')
         solicitud_params = { solicitud: { stock: 1 }, product_id:
         @product.id }
         expect do
@@ -74,11 +74,7 @@ RSpec.describe SolicitudController, type: :controller do
         expect(response).to redirect_to("/products/leer/#{@product.id}")
         expect(flash[:error]).to eq('Debe seleccionar una fecha y hora para la reserva!')
       end
-
-
     end
-
-
   end
 
   describe 'DELETE #eliminar' do
