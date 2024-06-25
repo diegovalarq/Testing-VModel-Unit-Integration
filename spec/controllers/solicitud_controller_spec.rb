@@ -38,6 +38,43 @@ RSpec.describe SolicitudController, type: :controller do
         expect(flash[:error]).to eq('No hay suficiente stock para realizar la solicitud!')
       end
     end
+
+    context 'with product with horario' do
+      it 'creates a new solicitud with valid reservation' do
+        @product.update(horarios: 'Wednesday,08:00,18:00;Friday,10:00,22:00')
+        solicitud_params = { solicitud: { stock: 1, reservation_datetime: '2024-06-07T12:00:00' }, product_id:
+        @product.id }
+        expect do
+          post :insertar, params: solicitud_params
+        end.to change(Solicitud, :count).by(1)
+        expect(response).to redirect_to("/products/leer/#{@product.id}")
+        expect(flash[:notice]).to eq('Solicitud de compra creada correctamente!')
+        @solicitud = Solicitud.last
+        expect(@solicitud.reservation_info).to eq('Solicitud de reserva para el día 07/06/2024, a las 12:00 hrs')
+      end
+
+      it 'does not create a new solicitud with invalid day' do
+        @product.update(horarios: 'Wednesday,08:00,18:00;Friday,20:00,22:00')
+        solicitud_params = { solicitud: { stock: 1, reservation_datetime: '2024-06-08T12:00:00' }, product_id:
+        @product.id }
+        expect do
+          post :insertar, params: solicitud_params
+        end.to change(Solicitud, :count).by(0)
+        expect(response).to redirect_to("/products/leer/#{@product.id}")
+        expect(flash[:error]).to eq('No hay reservas disponibles en el día y hora seleccionada!')
+      end
+
+      it 'does not create a new solicitud with empty reservation date' do
+        @product.update(horarios: 'Wednesday,08:00,18:00;Friday,20:00,22:00')
+        solicitud_params = { solicitud: { stock: 1 }, product_id:
+        @product.id }
+        expect do
+          post :insertar, params: solicitud_params
+        end.to change(Solicitud, :count).by(0)
+        expect(response).to redirect_to("/products/leer/#{@product.id}")
+        expect(flash[:error]).to eq('Debe seleccionar una fecha y hora para la reserva!')
+      end
+    end
   end
 
   describe 'DELETE #eliminar' do

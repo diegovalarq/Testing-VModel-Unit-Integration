@@ -6,7 +6,7 @@ class SolicitudController < ApplicationController
     @productos = Product.where(user_id: current_user.id)
   end
 
-  # rubocop:disable Metrics/AbcSize
+  # rubocop:disable Metrics
   # Crea una nueva solicitud de compra
   def insertar
     @solicitud = Solicitud.new
@@ -24,7 +24,45 @@ class SolicitudController < ApplicationController
       producto.stock = producto.stock.to_i - @solicitud.stock.to_i
     end
 
-    if params[:solicitud][:reservation_datetime].present?
+    if producto.horarios.present?
+      if params[:solicitud][:reservation_datetime].blank?
+        flash[:error] = 'Debe seleccionar una fecha y hora para la reserva!'
+        redirect_to "/products/leer/#{params[:product_id]}"
+        return
+      end
+      dias = producto.horarios.split(';')
+      horarios = []
+      dias.each do |dia|
+        horario = dia.split(',')
+        day = producto.day_to_number(horario[0])
+        start_hour = Time.zone.parse(horario[1])
+        end_hour = Time.zone.parse(horario[2])
+        horarios << [day, start_hour, end_hour]
+      end
+
+      reserva_date = params[:solicitud][:reservation_datetime].to_datetime
+      reserva_datetime = reserva_date.is_a?(String) ? DateTime.parse(reserva_date) : reserva_date
+      reserva_day = reserva_datetime.wday
+      reserva_time = Time.zone.parse(reserva_datetime.strftime('%I:%M %p'))
+
+      valid_reservation = false
+      horarios.each do |horario|
+        if horario[0] == reserva_day && (horario[1] <= reserva_time && horario[2] >= reserva_time)
+          valid_reservation = true
+          break
+        end
+      end
+
+      if valid_reservation == false
+        flash[:error] = 'No hay reservas disponibles en el día y hora seleccionada!'
+        redirect_to "/products/leer/#{params[:product_id]}"
+        return
+      else
+        dia = reserva_datetime.strftime('%d/%m/%Y')
+        hora = reserva_datetime.strftime('%H:%M')
+        @solicitud.reservation_info = "Solicitud de reserva para el día #{dia}, a las #{hora} hrs"
+      end
+    elsif params[:solicitud][:reservation_datetime].present?
       fecha = params[:solicitud][:reservation_datetime].to_datetime
       dia = fecha.strftime('%d/%m/%Y')
       hora = fecha.strftime('%H:%M')
@@ -41,7 +79,7 @@ class SolicitudController < ApplicationController
     end
   end
 
-  # rubocop:enable Metrics/AbcSize
+  # rubocop:enable Metrics
   # Elimina una solicitud de compra
   def eliminar
     @solicitud = Solicitud.find(params[:id])

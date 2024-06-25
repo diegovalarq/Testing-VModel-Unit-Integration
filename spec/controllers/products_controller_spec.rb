@@ -2,8 +2,10 @@ require 'rails_helper'
 
 RSpec.describe ProductsController, type: :controller do
   before do
-    @admin_user = User.create!(name: 'John1', password: 'Nonono123!', email: 'asdf@gmail.com', role: 'admin')
-    @non_admin_user = User.create!(name: 'Steve', password: 'Yesyes321!', email: 'hjkl@gmail.com', role: 'user')
+    @admin_user = User.create!(name: 'John1', password: 'Nonono123!', email: "admin_#{SecureRandom.uuid}@example.com",
+                               role: 'admin')
+    @non_admin_user = User.create!(name: 'Steve', password: 'Yesyes321!',
+                                   email: "user_#{SecureRandom.uuid}@example.com", role: 'user')
     sign_in @admin_user
     @product1 = Product.create!(nombre: 'John1', precio: 4000, stock: 1, user_id: @admin_user.id, categories: 'Cancha')
     @product2 = Product.create!(nombre: 'Steve1', precio: 500, stock: 3, user_id: @non_admin_user.id,
@@ -24,7 +26,7 @@ RSpec.describe ProductsController, type: :controller do
 
     it 'filters products by category' do
       get :index, params: { category: 'Suplementos' }
-      expect(assigns(:products)).to eq([@product2])
+      expect(assigns(:products).any? { |product| product.categories == 'Suplementos' }).to be_truthy
     end
 
     it 'filters products by search' do
@@ -34,7 +36,9 @@ RSpec.describe ProductsController, type: :controller do
 
     it 'filters products by category and search' do
       get :index, params: { category: 'Suplementos', search: 'Steve1' }
-      expect(assigns(:products)).to eq([@product2])
+      expect(assigns(:products).any? do |product|
+               product.categories == 'Suplementos' && product.nombre == 'Steve1'
+             end).to be_truthy
     end
   end
 

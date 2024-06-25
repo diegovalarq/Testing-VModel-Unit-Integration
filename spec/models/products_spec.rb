@@ -66,4 +66,14 @@ RSpec.describe Product, type: :model do
     @product.precio = -1
     expect(@product).to_not be_valid
   end
+
+  it 'day to number returns the correct number for each day' do
+    expect(@product.day_to_number('Monday')).to eq(1)
+    expect(@product.day_to_number('Tuesday')).to eq(2)
+    expect(@product.day_to_number('Wednesday')).to eq(3)
+    expect(@product.day_to_number('Thursday')).to eq(4)
+    expect(@product.day_to_number('Friday')).to eq(5)
+    expect(@product.day_to_number('Saturday')).to eq(6)
+    expect(@product.day_to_number('Sunday')).to eq(7)
+  end
 end

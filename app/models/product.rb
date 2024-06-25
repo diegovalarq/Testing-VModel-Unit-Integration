@@ -31,4 +31,17 @@ class Product < ApplicationRecord
   has_many :solicituds, dependent: :destroy
   validates :stock, numericality: { greater_than_or_equal_to: 0 }
   validates :precio, numericality: { greater_than_or_equal_to: 0 }
+
+  def day_to_number(day_name)
+    days = {
+      'Monday' => 1,
+      'Tuesday' => 2,
+      'Wednesday' => 3,
+      'Thursday' => 4,
+      'Friday' => 5,
+      'Saturday' => 6,
+      'Sunday' => 7
+    }
+    days[day_name]
+  end
 end
