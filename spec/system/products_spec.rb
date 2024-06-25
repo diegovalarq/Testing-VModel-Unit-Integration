@@ -3,8 +3,8 @@ require 'rails_helper'
 RSpec.describe 'Products', type: :system do
   before do
     @user_admin = User.create!(name: 'John1', password: 'Nonono123!', email: "user_#{SecureRandom.uuid}@example.com",
-                         role: 'admin')
-    @regular_user = User.create!(name: 'Benjamin', password: 'Nonono123!', 
+                               role: 'admin')
+    @regular_user = User.create!(name: 'Benjamin', password: 'Nonono123!',
                                  email: "user_#{SecureRandom.uuid}@example.com", role: 'user')
   end
 
@@ -36,7 +36,7 @@ RSpec.describe 'Products', type: :system do
       # Create a product as admin
       login_as(@user_admin, scope: :user)
       @product = Product.create!(nombre: 'Cancha fútbol', precio: 5000, stock: 5, user_id: @user_admin.id,
-        categories: 'Cancha')
+                                 categories: 'Cancha')
       logout(:user)
       # Visit the product as regular user
       login_as(@regular_user, scope: :user)
@@ -46,38 +46,37 @@ RSpec.describe 'Products', type: :system do
     end
 
     it 'have price' do
-       # Create a product as admin
-       login_as(@user_admin, scope: :user)
-       @product = Product.create!(nombre: 'Cancha fútbol', precio: 5000, stock: 5, user_id: @user_admin.id,
-         categories: 'Cancha')
-       logout(:user)
-       # Visit the product as regular user
-       login_as(@regular_user, scope: :user)
-       visit root_path
-       visit "/products/leer/#{Product.last.id}"
-       expect(page).to have_selector('p', text: '$ 5.000')
+      # Create a product as admin
+      login_as(@user_admin, scope: :user)
+      @product = Product.create!(nombre: 'Cancha fútbol', precio: 5000, stock: 5, user_id: @user_admin.id,
+                                 categories: 'Cancha')
+      logout(:user)
+      # Visit the product as regular user
+      login_as(@regular_user, scope: :user)
+      visit root_path
+      visit "/products/leer/#{Product.last.id}"
+      expect(page).to have_selector('p', text: '$ 5.000')
     end
   end
 
   describe 'visiting solicitud created by regular user' do
     it 'solicitud of Cancha fútbol' do
-    # Create a product as admin
-    login_as(@user_admin, scope: :user)
-       @product = Product.create!(nombre: 'Cancha fútbol', precio: 5000, stock: 5, user_id: @user_admin.id,
-         categories: 'Cancha')
-       logout(:user)
-       # Create a reservation as regular user
-        login_as(@regular_user, scope: :user)
-        @solicitud = Solicitud.create!(
-          stock: 1,
-          status: 'Pendiente',
-          product_id: @product.id,
-          user_id: @regular_user.id
-        )
-        visit root_path
-        visit "/solicitud/index"
-        expect(page).to have_selector('p', text: 'Solicitud de reserva para la cancha: Cancha fútbol')
+      # Create a product as admin
+      login_as(@user_admin, scope: :user)
+      @product = Product.create!(nombre: 'Cancha fútbol', precio: 5000, stock: 5, user_id: @user_admin.id,
+                                 categories: 'Cancha')
+      logout(:user)
+      # Create a reservation as regular user
+      login_as(@regular_user, scope: :user)
+      @solicitud = Solicitud.create!(
+        stock: 1,
+        status: 'Pendiente',
+        product_id: @product.id,
+        user_id: @regular_user.id
+      )
+      visit root_path
+      visit '/solicitud/index'
+      expect(page).to have_selector('p', text: 'Solicitud de reserva para la cancha: Cancha fútbol')
     end
   end
-
 end
