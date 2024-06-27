@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.describe 'Products', type: :system do
   before do
+    driven_by(:rack_test)
     @user_admin = User.create!(name: 'Admin User', password: 'Password123!', email: "admin_#{SecureRandom.uuid}@example.com", role: 'admin')
     @regular_user = User.create!(name: 'Regular Diego', password: 'Sisisi321?', email: "diego_#{SecureRandom.uuid}@gmail.com", role: 'user')
   end
@@ -9,7 +10,6 @@ RSpec.describe 'Products', type: :system do
   describe 'visiting /products/crear' do
     context 'as an admin user' do
       before do
-        driven_by(:rack_test)
         login_as(@user_admin, scope: :user)
         visit '/products/crear'
       end
@@ -39,34 +39,25 @@ RSpec.describe 'Products', type: :system do
         expect(page).to have_current_path('/products/index')
         expect(page).to have_content('Producto creado Correctamente !')
       end
+
+      it 'includes horarios field in the form' do
+        expect(page).to have_field('product[horarios]', visible: :hidden)
+      end
+    end
+
+    context 'as a regular user' do
+      it 'shows access denied message' do
+        login_as(@regular_user, scope: :user)
+        visit '/products/crear'
+        expect(page).to have_content('Esta página es exclusiva para administradores.')
+      end
+    end
+
+    context 'as a guest user' do
+      it 'redirects to root path' do
+        visit '/products/crear'
+        expect(page).to have_current_path(root_path)
+      end
     end
   end
 end
-
-#       it 'displays horarios field when Cancha is selected' do
-#         select 'Cancha', from: 'product[categories]'
-#         expect(page).to have_field('Horarios')
-#       end
-
-#       it 'hides horarios field when other categories are selected' do
-#         select 'Accesorio tecnologico', from: 'product[categories]'
-#         expect(page).not_to have_field('Horarios')
-#       end
-#     end
-
-#     context 'as a regular user' do
-#       it 'shows access denied message' do
-#         login_as(@regular_user, scope: :user)
-#         visit '/products/crear'
-#         expect(page).to have_content('Esta página es exclusiva para administradores.')
-#       end
-#     end
-
-#     context 'as a guest user' do
-#       it 'redirects to login page' do
-#         visit '/products/crear'
-#         expect(page).to have_current_path(new_user_session_path)
-#       end
-#     end
-#   end
-# end
