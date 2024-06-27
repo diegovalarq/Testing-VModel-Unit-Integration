@@ -27,9 +27,9 @@ RSpec.describe 'User registration', type: :system do
         fill_in 'user[password]', with: 'Testing2024'
         fill_in 'user[password_confirmation]', with: 'Testing2024'
 
-        expect {
+        expect do
           click_button 'Registrarse'
-        }.to change(User, :count).by(1)
+        end.to change(User, :count).by(1)
 
         expect(page).to have_content('¡Bienvenid@! Te has registrado exitosamente.')
       end
