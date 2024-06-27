@@ -5,10 +5,12 @@ RSpec.describe 'User registration', type: :system do
     driven_by(:rack_test)
   end
 
-  describe 'signup page' do
-    before { visit new_user_registration_path }
+  describe 'register page' do
+    before do
+      visit '/register'
+    end
 
-    it 'displays the signup form' do
+    it 'displays the register form' do
       expect(page).to have_selector('h2', text: 'Registro')
       expect(page).to have_field('user[email]')
       expect(page).to have_field('user[name]')
@@ -19,11 +21,11 @@ RSpec.describe 'User registration', type: :system do
     end
 
     context 'with valid information' do
-      it 'allows user to sign up' do
-        fill_in 'user[email]', with: 'test@example.com'
-        fill_in 'user[name]', with: 'Test User'
-        fill_in 'user[password]', with: 'password123'
-        fill_in 'user[password_confirmation]', with: 'password123'
+      it 'allows user to register' do
+        fill_in 'user[email]', with: 'junio@corre.com'
+        fill_in 'user[name]', with: 'DiegoTest'
+        fill_in 'user[password]', with: 'Testing2024'
+        fill_in 'user[password_confirmation]', with: 'Testing2024'
 
         expect {
           click_button 'Registrarse'
@@ -34,7 +36,7 @@ RSpec.describe 'User registration', type: :system do
     end
 
     context 'with invalid information' do
-      it 'does not allow user to sign up' do
+      it 'does not allow user to register' do
         click_button 'Registrarse'
 
         expect(page).to have_content('Email: no puede estar en blanco')
@@ -42,11 +44,11 @@ RSpec.describe 'User registration', type: :system do
         expect(page).to have_content('Name: no puede estar en blanco')
       end
 
-      it 'shows error for mismatched passwords' do
-        fill_in 'user[email]', with: 'test@example.com'
-        fill_in 'user[name]', with: 'Test User'
-        fill_in 'user[password]', with: 'password123'
-        fill_in 'user[password_confirmation]', with: 'password456'
+      it 'shows error for non matching passwords' do
+        fill_in 'user[email]', with: 'contra@mala.com'
+        fill_in 'user[name]', with: 'FredDumb'
+        fill_in 'user[password]', with: 'contra123'
+        fill_in 'user[password_confirmation]', with: 'sena456'
 
         click_button 'Registrarse'
 
@@ -56,11 +58,11 @@ RSpec.describe 'User registration', type: :system do
 
     context 'admin registration' do
       it 'allows admin registration with correct secret code' do
-        fill_in 'user[email]', with: 'admin@example.com'
-        fill_in 'user[name]', with: 'Admin User'
-        fill_in 'user[password]', with: 'password123'
-        fill_in 'user[password_confirmation]', with: 'password123'
-        fill_in 'user[role]', with: 'correct_secret_code'
+        fill_in 'user[email]', with: 'admin@gmail.com'
+        fill_in 'user[name]', with: 'El Admins'
+        fill_in 'user[password]', with: 'adminpass.123'
+        fill_in 'user[password_confirmation]', with: 'adminpass.123'
+        fill_in 'user[role]', with: 'admin'
 
         click_button 'Registrarse'
 
