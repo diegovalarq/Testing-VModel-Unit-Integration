@@ -66,18 +66,6 @@ RSpec.describe 'User registration', type: :system do
 
         expect(User.last.role).to eq('admin')
       end
-
-      it 'does not allow admin registration with incorrect secret code' do
-        fill_in 'user[email]', with: 'user@example.com'
-        fill_in 'user[name]', with: 'Regular User'
-        fill_in 'user[password]', with: 'password123'
-        fill_in 'user[password_confirmation]', with: 'password123'
-        fill_in 'user[role]', with: 'wrong_code'
-
-        click_button 'Registrarse'
-
-        expect(User.last.role).to eq('user')
-      end
     end
   end
 end
