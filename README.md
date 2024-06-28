@@ -3,7 +3,7 @@
 ### Logros de la entrega:
 [Recuerden especificar quien hizo cada cosa]
 * Sanchez unit, CI
-* Valenzuela Integration
+* Valenzuela System Testing para productos/crear y /register
 
 ### Informacion para el correcto:
 Incluir aqui cualquier detalle que pueda ser importante al momento de corregir.
@@ -29,3 +29,6 @@ https://www.youtube.com/watch?v=I9dz2w0bIGE
 https://www.youtube.com/watch?v=K6RPMhcRICE&list=PLr442xinba86s9cCWxoIH_xq5UE9Wwo4Z
 https://rspec.info/features/6-0/rspec-rails/controller-specs/
 https://www.rubyguides.com/2019/11/rails-flash-messages/
+
+- Tarea 4
+Diego ha realizado sus tests usando rack-tests, pues no logró hacer funcionar selenium en su máquina, que usa windows y WSL para correr el proyecto. Se han escrito alternativas a evaluación del comportamiento basado en el código de Javascript.

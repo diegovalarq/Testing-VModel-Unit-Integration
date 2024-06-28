@@ -5,6 +5,7 @@ SimpleCov.start do
 end
 
 # This file is copied to spec/ when you run 'rails generate rspec:install'
+require 'capybara/rspec'
 require 'spec_helper'
 ENV['RAILS_ENV'] ||= 'test'
 require_relative '../config/environment'
@@ -68,6 +69,13 @@ RSpec.configure do |config|
   # arbitrary gems may also be filtered via:
   # config.filter_gems_from_backtrace("gem name")
   config.before(:each, type: :system) do
-    driven_by :selenium_chrome
+    driven_by :selenium_chrome_headless
   end
+  
+end
+Capybara.register_driver :headless_chrome do |app|
+  capabilities = Selenium::WebDriver::Remote::Capabilities.chrome(
+      'goog:chromeOptions': { args: %w(no-sandbox headless disable-gpu window-size=1280,1024 disable-features=VizDisplayCompositor) } )
+
+  Capybara::Selenium::Driver.new(app, browser: :chrome, desired_capabilities: capabilities)
 end
