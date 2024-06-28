@@ -3,20 +3,21 @@ require 'rails_helper'
 RSpec.describe 'Products', type: :system do
   before do
     driven_by(:rack_test)
-    @user_admin = User.create!(name: 'Admin User', password: 'Password123!',
-                               email: "admin_#{SecureRandom.uuid}@example.com", role: 'admin')
+    
+    @user_admin = User.create!(name: 'Admin Fred', password: 'FredAgainNo456!',
+                               email: "admin_#{SecureRandom.uuid}@fredagain.com", role: 'admin')
     @regular_user = User.create!(name: 'Regular Diego', password: 'Sisisi321?',
                                  email: "diego_#{SecureRandom.uuid}@gmail.com", role: 'user')
   end
 
   describe 'visiting /products/crear' do
-    context 'as an admin user' do
+    context 'as an admin' do
       before do
         login_as(@user_admin, scope: :user)
         visit '/products/crear'
       end
 
-      it 'displays the product creation form' do
+      it 'displays product creation form' do
         expect(page).to have_selector('h1', text: 'Crear Producto')
         expect(page).to have_field('Nombre')
         expect(page).to have_field('Precio')
@@ -28,10 +29,10 @@ RSpec.describe 'Products', type: :system do
       end
 
       it 'allows creating a product' do
-        fill_in 'Nombre', with: 'Test Product'
+        fill_in 'Nombre', with: 'Cancha de PADEL AYYY'
         select 'Cancha', from: 'product[categories]'
-        fill_in 'Precio', with: '100'
-        fill_in 'Stock', with: '10'
+        fill_in 'Precio', with: '10000321'
+        fill_in 'Stock', with: '13'
         attach_file 'product[image]', Rails.root.join('spec/fixtures/files/mock_image.jpg')
 
         expect do
@@ -42,7 +43,7 @@ RSpec.describe 'Products', type: :system do
         expect(page).to have_content('Producto creado Correctamente !')
       end
 
-      it 'includes horarios field in the form' do
+      it 'includes horarios in the form' do
         expect(page).to have_field('product[horarios]', visible: :hidden)
       end
     end
@@ -55,7 +56,7 @@ RSpec.describe 'Products', type: :system do
       end
     end
 
-    context 'as a guest user' do
+    context 'non registered user' do
       it 'redirects to root path' do
         visit '/products/crear'
         expect(page).to have_current_path(root_path)
