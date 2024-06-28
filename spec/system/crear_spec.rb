@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe 'Products', type: :system do
   before do
     driven_by(:rack_test)
-    
+
     @user_admin = User.create!(name: 'Admin Fred', password: 'FredAgainNo456!',
                                email: "admin_#{SecureRandom.uuid}@fredagain.com", role: 'admin')
     @regular_user = User.create!(name: 'Regular Diego', password: 'Sisisi321?',
