@@ -3,8 +3,10 @@ require 'rails_helper'
 RSpec.describe 'Products', type: :system do
   before do
     driven_by(:rack_test)
-    @user_admin = User.create!(name: 'Admin User', password: 'Password123!', email: "admin_#{SecureRandom.uuid}@example.com", role: 'admin')
-    @regular_user = User.create!(name: 'Regular Diego', password: 'Sisisi321?', email: "diego_#{SecureRandom.uuid}@gmail.com", role: 'user')
+    @user_admin = User.create!(name: 'Admin User', password: 'Password123!',
+                               email: "admin_#{SecureRandom.uuid}@example.com", role: 'admin')
+    @regular_user = User.create!(name: 'Regular Diego', password: 'Sisisi321?',
+                                 email: "diego_#{SecureRandom.uuid}@gmail.com", role: 'user')
   end
 
   describe 'visiting /products/crear' do
@@ -21,7 +23,7 @@ RSpec.describe 'Products', type: :system do
         expect(page).to have_field('Stock')
         expect(page).to have_select('product[categories]')
         expect(page).to have_selector('label', text: 'Imagen')
-        expect(page).to have_selector('input[type="file"]')        
+        expect(page).to have_selector('input[type="file"]')
         expect(page).to have_button('Guardar')
       end
 
@@ -30,11 +32,11 @@ RSpec.describe 'Products', type: :system do
         select 'Cancha', from: 'product[categories]'
         fill_in 'Precio', with: '100'
         fill_in 'Stock', with: '10'
-        attach_file 'product[image]', Rails.root.join('spec', 'fixtures', 'files', 'mock_image.jpg')
-        
-        expect {
+        attach_file 'product[image]', Rails.root.join('spec/fixtures/files/mock_image.jpg')
+
+        expect do
           click_button 'Guardar'
-        }.to change(Product, :count).by(1)
+        end.to change(Product, :count).by(1)
 
         expect(page).to have_current_path('/products/index')
         expect(page).to have_content('Producto creado Correctamente !')
